@@ -11,7 +11,7 @@ usersRouter.get("/", async (req, res, next) => {
         const users = await UsersModel.find();
         res.status(200).json(users);
     } catch (error) {
-        next();
+        next(error);
     }
 });
 
@@ -26,7 +26,7 @@ usersRouter.get("/me", async (req, res, next) => {
             next(createError(404, "User not found"));
         }
     } catch (error) {
-        next();
+        next(error);
     }
 });
 
@@ -45,7 +45,7 @@ usersRouter.put("/me", async (req, res, next) => {
             next(createError(404, "User not found"));
         }
     } catch (error) {
-        next();
+        next(error);
     }
 });
 
