@@ -14,12 +14,39 @@ usersRouter.get("/", async (req, res, next) => {
 });
 
 usersRouter.get("/me", async (req, res, next) => {
+    try {
+        const userId = req.query.userId;
+        const currentUser = await UsersModel.findById(userId);
 
-})
+        if (currentUser) {
+            res.status(200).json(currentUser);
+        } else {
+            next(createError(404, "User not found"));
+        }
+    } catch (error) {
+        next();
+    }
+});
+
 
 usersRouter.put("/me", async (req, res, next) => {
+    try {
+        const updates = req.body;
+        const userId = req.query.userId;
+        const updatedUser = await UsersModel.findByIdAndUpdate(userId, updates, {
+            new: true,
+            runValidators: true,
+        });
 
-})
+        if (updatedUser) {
+            res.status(200).json(updatedUser);
+        } else {
+            next(createError(404, "User not found"));
+        }
+    } catch (error) {
+        next();
+    }
+});
 
 usersRouter.post("/me/avatar", async (req, res, next) => {
 
