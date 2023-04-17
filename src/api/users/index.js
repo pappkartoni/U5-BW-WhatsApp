@@ -117,17 +117,10 @@ usersRouter.post("/session", async (req, res, next) => {
     }
 })
 
-usersRouter.delete("/session", async (req, res, next) => {
+usersRouter.delete("/session", jwtAuth, async (req, res, next) => {
     try {
-        const { currentRefreshToken } = req.body
-        const user = await UsersModel.findOne({ refreshToken: currentRefreshToken })
-        if (user) {
-            user.refreshToken = undefined
-            user.save()
-            res.status(204).send()
-        } else {
-            next(createHttpError(401, "Invalid token"))
-        }
+        const user = await UsersModel.findByIdAndUpdate(req.user._id, { refreshToken: undefined })
+        res.status(204).send()
     } catch (error) {
         next(error)
     }
