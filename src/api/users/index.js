@@ -8,7 +8,17 @@ const usersRouter = express.Router()
 
 usersRouter.get("/", async (req, res, next) => {
     try {
-        const users = await UsersModel.find();
+        const { username, email } = req.query;
+        let query = {};
+
+        if (username) {
+            query.name = username;
+        }
+        if (email) {
+            query.email = email;
+        }
+
+        const users = await UsersModel.find(query);
         res.status(200).json(users);
     } catch (error) {
         next(error);
