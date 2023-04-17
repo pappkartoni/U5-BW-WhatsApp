@@ -68,9 +68,9 @@ export const jwtAuth = async (req, res, next) => {
     if (!req.headers.authorization) {
         next(createHttpError(401, "No bearer token provided. 🐻"))
     } else {
-        const accessToken = req.headers.authorization.replace("Bearer ", "")
+        const refreshToken = req.headers.authorization.replace("Bearer ", "")
         try {
-            const payload = verifyAccessToken(accessToken)
+            const payload = await verifyRefreshToken(refreshToken)
             req.user = {_id: payload._id}
             next()
         } catch (error) {

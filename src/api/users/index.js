@@ -2,7 +2,7 @@ import express from "express"
 import createError from "http-errors"
 import UsersModel from "./model.js"
 import createHttpError from "http-errors"
-import { createTokens, verifyAndRefreshTokens } from "../../lib/tools.js"
+import { cloudinaryUploader, createTokens, jwtAuth, verifyAndRefreshTokens } from "../../lib/tools.js"
 import passport from "passport"
 
 const usersRouter = express.Router()
@@ -70,7 +70,7 @@ usersRouter.put("/me", async (req, res, next) => {
     }
 });
 
-usersRouter.post("/me/avatar", async (req, res, next) => {
+usersRouter.post("/me/avatar", jwtAuth, cloudinaryUploader, async (req, res, next) => {
     try {
         const updatedUser = await UsersModel.findByIdAndUpdate(req.user._id, {avatar: req.file.path}, {new: true, runValidators: true})
         res.send(updatedUser)
