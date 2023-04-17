@@ -5,11 +5,16 @@ import UsersModel from "./model.js"
 const usersRouter = express.Router()
 
 usersRouter.get("/", async (req, res, next) => {
-
-})
+    try {
+        const users = await UsersModel.find();
+        res.status(200).json(users);
+    } catch (error) {
+        next();
+    }
+});
 
 usersRouter.get("/me", async (req, res, next) => {
-    
+
 })
 
 usersRouter.put("/me", async (req, res, next) => {
