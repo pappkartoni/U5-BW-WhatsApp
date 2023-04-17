@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken"
 import UsersModel from "../api/users/model.js"
 import createHttpError from "http-errors"
+import GoogleStrategy from "passport-google-oauth20"
 
 export const createAccessToken = payload => 
     new Promise((resolve, reject) => 
@@ -59,3 +60,49 @@ export const verifyAndRefreshTokens = async currentRefreshToken => {
         throw new createHttpError(401, "Please log in.")
     }
 }
+
+export const jwtAuth = async (req, res, next) => {
+    if (!req.headers.authorization) {
+        next(createHttpError(401, "No bearer token provided. 🐻"))
+    } else {
+        const accessToken = req.headers.authorization.replace("Bearer ", "")
+        try {
+            const payload = verifyAccessToken(accessToken)
+            req.user = {_id: payload._id}
+            next()
+        } catch (error) {
+            console.log(error)
+            next(createHttpError(401, "Invalid token."))
+        }
+    }
+}
+
+export const googleStrategy = new GoogleStrategy(
+    {
+        clientID: process.env.GOOGLE_ID,
+        clientSecret: process.env.GOOGLE_SECRET,
+        callbackURL: `${process.env.BE_URL}/users/googlecallback`
+    },
+    async (_, __, profile, pnext) => {
+        try {
+            const {email, given_name, family_name, sub} = profile._json
+            const user = await UsersModel.findOne({email})
+            if (user) {
+                const {accessToken, refreshToken} = await createTokens(user)
+                pnext(null, {accessToken, refreshToken})
+            } else {
+                const newUser = await UsersModel({
+                    name: given_name + " " + family_name,
+                    email,
+                    googleId: sub
+                })
+
+                const created = newUser.save()
+                const {accessToken, refreshToken} = createTokens(created)
+                pnext(null, {accessToken, refreshToken})
+            }
+        } catch (error) {
+            pnext(error)
+        }
+    }
+)

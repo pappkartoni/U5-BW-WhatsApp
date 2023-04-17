@@ -3,8 +3,19 @@ import createError from "http-errors"
 import UsersModel from "./model.js"
 import createHttpError from "http-errors"
 import { createTokens, verifyAndRefreshTokens } from "../../lib/tools.js"
+import passport from "passport"
 
 const usersRouter = express.Router()
+
+usersRouter.get("/googlelogin", passport.authenticate("google", { scope: ["profile", "email"]}))
+
+usersRouter.get("/googlecallback", passport.authenticate("google", { session: false }), (req, res, next) => {
+    try {
+        res.redirect(`${process.env.FE_URL}?refreshToken=${req.user.refreshToken}`) //not sure about this one
+    } catch (error) {
+        next(error)
+    }
+})
 
 usersRouter.get("/", async (req, res, next) => {
     try {
