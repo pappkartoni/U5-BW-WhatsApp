@@ -11,7 +11,7 @@ usersRouter.get("/googlelogin", passport.authenticate("google", { scope: ["profi
 
 usersRouter.get("/googlecallback", passport.authenticate("google", { session: false }), (req, res, next) => {
     try {
-        res.redirect(`${process.env.FE_URL}?refreshToken=${req.user.refreshToken}`) //not sure about this one
+        res.redirect(`${process.env.FE_URL}?accessToken=${req.user.accessToken}&refreshToken=${req.user.refreshToken}`) //not sure about this one
     } catch (error) {
         next(error)
     }

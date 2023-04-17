@@ -12,7 +12,7 @@ import { googleStrategy } from "./lib/tools.js"
 
 const server = Express()
 const port = process.env.PORT || 3420
-const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
+const whitelist = [process.env.FE_URL]
 
 passport.use("google", googleStrategy)
 
