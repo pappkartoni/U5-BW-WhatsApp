@@ -8,13 +8,13 @@ import {badRequestHandler, unauthorizedHandler, notfoundHandler, genericErrorHan
 import usersRouter from "./api/users/index.js"
 import createHttpError from "http-errors"
 import passport from "passport"
-//import { googleStrategy } from "./lib/tools.js"
+import { googleStrategy } from "./lib/tools.js"
 
 const server = Express()
 const port = process.env.PORT || 3420
 const whitelist = [process.env.FE_DEV_URL, process.env.FE_PROD_URL]
 
-//passport.use("google", googleStrategy)
+passport.use("google", googleStrategy)
 
 server.use(cors({
     origin: (currentOrigin, corsNext) => {
@@ -27,7 +27,7 @@ server.use(cors({
 }))
 
 server.use(Express.json())
-//server.use(passport.initialize())
+server.use(passport.initialize())
 
 server.use("/users", usersRouter)
 

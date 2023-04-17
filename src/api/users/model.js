@@ -9,7 +9,8 @@ const UsersSchema = new Schema(
     email: { type: String, required: true, unique: true, lowercase: true },
     avatar: { type: String },
     password: { type: String },
-    refreshToken: { type: String }
+    refreshToken: { type: String },
+    googleId: { type: String }
   },
   {
     timestamps: true,
