@@ -7,12 +7,28 @@ import { createTokens, verifyAndRefreshTokens } from "../../lib/tools.js"
 const usersRouter = express.Router()
 
 usersRouter.get("/", async (req, res, next) => {
-
-})
+    try {
+        const users = await UsersModel.find();
+        res.status(200).json(users);
+    } catch (error) {
+        next();
+    }
+});
 
 usersRouter.get("/me", async (req, res, next) => {
+    try {
+        const userId = req.query.userId;
+        const currentUser = await UsersModel.findById(userId);
 
-})
+        if (currentUser) {
+            res.status(200).json(currentUser);
+        } else {
+            next(createError(404, "User not found"));
+        }
+    } catch (error) {
+        next();
+    }
+});
 
 usersRouter.put("/me", async (req, res, next) => {
     try {
@@ -50,10 +66,10 @@ usersRouter.get("/:userId", async (req, res, next) => {
 usersRouter.post("/account", async (req, res, next) => {
     try {
         const newUser = new UsersModel(req.body)
-        const {_id} = await newUser.save()
-        const {accessToken, refreshToken} = await createTokens(newUser)
+        const { _id } = await newUser.save()
+        const { accessToken, refreshToken } = await createTokens(newUser)
 
-        res.send({_id, accessToken, refreshToken})
+        res.send({ _id, accessToken, refreshToken })
     } catch (error) {
         next(error)
     }
@@ -61,12 +77,12 @@ usersRouter.post("/account", async (req, res, next) => {
 
 usersRouter.post("/session", async (req, res, next) => {
     try {
-        const {email, password} = req.body
+        const { email, password } = req.body
 
         const user = await UsersModel.checkCredentials(email, password)
         if (user) {
-            const {accessToken, refreshToken} = await createTokens(user)
-            res.send({accessToken, refreshToken})
+            const { accessToken, refreshToken } = await createTokens(user)
+            res.send({ accessToken, refreshToken })
         } else {
             next(createHttpError(401, "Invalid credentials"))
         }
@@ -77,8 +93,8 @@ usersRouter.post("/session", async (req, res, next) => {
 
 usersRouter.delete("/session", async (req, res, next) => {
     try {
-        const {currentRefreshToken} = req.body
-        const user = await UsersModel.findOne({refreshToken: currentRefreshToken})
+        const { currentRefreshToken } = req.body
+        const user = await UsersModel.findOne({ refreshToken: currentRefreshToken })
         if (user) {
             user.refreshToken = undefined
             user.save()
@@ -93,9 +109,9 @@ usersRouter.delete("/session", async (req, res, next) => {
 
 usersRouter.post("/session/refresh", async (req, res, next) => {
     try {
-        const {currentRefreshToken} = req.body
-        const {accessToken, refreshToken} = await verifyAndRefreshTokens(currentRefreshToken)
-        res.send({accessToken, refreshToken})
+        const { currentRefreshToken } = req.body
+        const { accessToken, refreshToken } = await verifyAndRefreshTokens(currentRefreshToken)
+        res.send({ accessToken, refreshToken })
     } catch (error) {
         next(error)
     }
