@@ -2,6 +2,9 @@ import jwt from "jsonwebtoken"
 import UsersModel from "../api/users/model.js"
 import createHttpError from "http-errors"
 import GoogleStrategy from "passport-google-oauth20"
+import multer from "multer"
+import { CloudinaryStorage } from "multer-storage-cloudinary"
+import { v2 as cloudinary } from "cloudinary"
 
 export const createAccessToken = payload => 
     new Promise((resolve, reject) => 
@@ -106,3 +109,12 @@ export const googleStrategy = new GoogleStrategy(
         }
     }
 )
+
+export const cloudinaryUploader = multer({
+    storage: new CloudinaryStorage({
+        cloudinary,
+        params: {
+            folder: "u5/whatsapp/avatars"
+        }
+    })
+}).single("avatar")
