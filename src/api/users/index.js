@@ -19,14 +19,11 @@ usersRouter.get("/googlecallback", passport.authenticate("google", { session: fa
 
 usersRouter.get("/", async (req, res, next) => {
     try {
-        const { username, email } = req.query;
+        const { q } = req.query;
         let query = {};
 
-        if (username) {
-            query.name = username;
-        }
-        if (email) {
-            query.email = email;
+        if (q) {
+            query.$or = [{ name: { $regex: q, $options: "i" } }, { email: { $regex: q, $options: "i" } }];
         }
 
         const users = await UsersModel.find(query);
