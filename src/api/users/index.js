@@ -50,10 +50,9 @@ usersRouter.get("/", async (req, res, next) => {
   }
 });
 
-usersRouter.get("/me", async (req, res, next) => {
+usersRouter.get("/me", jwtAuth, async (req, res, next) => {
   try {
-    const userId = req.query.userId;
-    const currentUser = await UsersModel.findById(userId);
+    const currentUser = await UsersModel.findById(req.user._id);
 
     if (currentUser) {
       res.status(200).json(currentUser);

@@ -16,6 +16,7 @@ import createHttpError from "http-errors";
 import passport from "passport";
 import { googleStrategy } from "./lib/tools.js";
 import chatsRouter from "./api/chat/index.js";
+import chatsRouter from "./api/chat/index.js";
 
 const server = Express();
 const port = process.env.PORT || 3420;
