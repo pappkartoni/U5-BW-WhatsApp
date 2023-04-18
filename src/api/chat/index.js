@@ -9,7 +9,7 @@ router.get("/chats", jwtAuth, async (req, res) => {
     const userId = req.user._id;
     const chats = await ChatsModel.find({ members: userId }).populate(
       "members",
-      "username email avatar"
+      "name email avatar"
     );
     if (chats) {
       res.status(200).send(chats);
@@ -51,7 +51,7 @@ router.get("/chats/:id", async (req, res, next) => {
 
     const chat = await ChatsModel.findOne({ _id: chatId }).populate(
       "members",
-      "username email avatar"
+      "name email avatar"
     );
     if (!chat) {
       return next(createError(404, "Chat not found"));
