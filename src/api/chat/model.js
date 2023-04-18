@@ -2,16 +2,6 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const ChatSchema = new Schema(
-  {
-    members: [{ type: Schema.Types.ObjectId, ref: "user" }],
-    messages: [MessageSchema],
-  },
-  {
-    timestamps: true,
-  }
-);
-
 const MessageSchema = new Schema(
   {
     timestamp: { type: Number, required: true },
@@ -20,6 +10,16 @@ const MessageSchema = new Schema(
       text: { type: String, required: true },
       media: { type: String },
     },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const ChatSchema = new Schema(
+  {
+    members: [{ type: Schema.Types.ObjectId, ref: "user" }],
+    messages: [MessageSchema],
   },
   {
     timestamps: true,
