@@ -45,7 +45,7 @@ router.post("/chats", jwtAuth, async (req, res, next) => {
   }
 });
 
-router.get("/chats/:id", async (req, res, next) => {
+router.get("/chats/:id", jwtAuth, async (req, res, next) => {
   try {
     const chatId = req.params.id;
 
