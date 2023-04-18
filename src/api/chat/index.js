@@ -38,16 +38,6 @@ router.post("/chats", jwtAuth, async (req, res, next) => {
         messages: [],
       });
 
-      // const senderSocket = socketMap.get(senderId);
-      // const recipientSocket = socketMap.get(recipientId);
-
-      // if (senderSocket) {
-      //   senderSocket.join(newChat._id);
-      // }
-      // if (recipientSocket) {
-      //   recipientSocket.join(newChat._id);
-      // }
-
       res.status(201).send(newChat);
     }
   } catch (error) {
