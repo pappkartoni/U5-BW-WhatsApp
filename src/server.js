@@ -9,6 +9,7 @@ import usersRouter from "./api/users/index.js"
 import createHttpError from "http-errors"
 import passport from "passport"
 import { googleStrategy } from "./lib/tools.js"
+import chatsRouter from "./api/chat/index.js"
 
 const server = Express()
 const port = process.env.PORT || 3420
@@ -30,6 +31,7 @@ server.use(Express.json())
 server.use(passport.initialize())
 
 server.use("/users", usersRouter)
+server.use("/chats", chatsRouter)
 
 server.use(badRequestHandler)
 server.use(unauthorizedHandler)

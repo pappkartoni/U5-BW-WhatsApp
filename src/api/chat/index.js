@@ -1,10 +1,10 @@
 import express from "express";
 import ChatsModel from "./model.js";
-import { jwtAuth } from "../../lib/tools";
+import { jwtAuth } from "../../lib/tools.js";
 
-const router = express.Router();
+const chatsRouter = express.Router();
 
-router.get("/chats", jwtAuth, async (req, res) => {
+chatsRouter.get("/", jwtAuth, async (req, res) => {
   try {
     const userId = req.user._id;
     const chats = await ChatsModel.find({ members: userId }).populate(
@@ -21,7 +21,7 @@ router.get("/chats", jwtAuth, async (req, res) => {
   }
 });
 
-router.post("/chats", jwtAuth, async (req, res, next) => {
+chatsRouter.post("/", jwtAuth, async (req, res, next) => {
   try {
     const { recipientId } = req.body;
     const senderId = req.user._id;
@@ -45,7 +45,7 @@ router.post("/chats", jwtAuth, async (req, res, next) => {
   }
 });
 
-router.get("/chats/:id", jwtAuth, async (req, res, next) => {
+chatsRouter.get("/:id", jwtAuth, async (req, res, next) => {
   try {
     const chatId = req.params.id;
 
@@ -63,4 +63,4 @@ router.get("/chats/:id", jwtAuth, async (req, res, next) => {
   }
 });
 
-export default router;
+export default chatsRouter;
