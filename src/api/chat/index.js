@@ -15,11 +15,22 @@ export const newConnectionHandler = socket => {
   })
 
   socket.on("join-room", room => 
-    	socket.join(room)
+      {
+        console.log(room)
+    	  socket.join(room)
+    }
   )
 
-  socket.on("outgoing-msg", (msg, room) => {
-      socket.to(room).emit("newMessage", msg)
+  socket.on("outgoing-msg", async (data) => {
+      socket.to(data.room).emit("newMessage", data)
+      const newMsg = {
+        sender: data.sender,
+        content: {
+          text: data.text
+        }
+      }
+      console.log(data, newMsg)
+      const updated = await ChatsModel.findByIdAndUpdate(data.room, {$push: {messages: newMsg}}, { new: true, runValidators: true })
   })
 
   socket.on("incoming-msg", (msg, room) => {
