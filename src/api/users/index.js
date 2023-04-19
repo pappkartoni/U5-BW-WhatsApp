@@ -64,14 +64,18 @@ usersRouter.get("/me", jwtAuth, async (req, res, next) => {
   }
 });
 
-usersRouter.put("/me", async (req, res, next) => {
+usersRouter.put("/me", jwtAuth, async (req, res, next) => {
   try {
     const updates = req.body;
-    const userId = req.query.userId;
-    const updatedUser = await UsersModel.findByIdAndUpdate(userId, updates, {
-      new: true,
-      runValidators: true,
-    });
+    const currentUser = await UsersModel.findById(req.user._id);
+    const updatedUser = await UsersModel.findByIdAndUpdate(
+      currentUser,
+      updates,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
 
     if (updatedUser) {
       res.status(200).json(updatedUser);
