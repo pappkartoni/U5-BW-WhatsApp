@@ -2,16 +2,28 @@ import express from "express";
 import ChatsModel from "./model.js";
 import { jwtAuth } from "../../lib/tools.js";
 import createHttpError from "http-errors";
-
+import { io } from "../../server.js"
 let users = []
 
 export const newConnectionHandler = socket => {
   console.log(`New client ${socket.id}`)
   socket.emit("welcome", {message: `What's up ${socket.id}`})
+  
+  socket.on("connect", payload => {
+    users.push({ username: payload.username, socketId: socket.id })
+    socket.emit("connected", users)
+  })
 
+  socket.on("join-room", room => 
+    	socket.join(room)
+  )
 
-  socket.on("outgoing-msg", msg => {
-      socket.broadcast.emit("newMessage", msg)
+  socket.on("outgoing-msg", (msg, room) => {
+      socket.to(room).emit("newMessage", msg)
+  })
+
+  socket.on("incoming-msg", (msg, room) => {
+
   })
 
   socket.on("disconnect", () => {
@@ -30,6 +42,11 @@ chatsRouter.get("/", jwtAuth, async (req, res) => {
       "name email avatar"
     );
     if (chats) {
+      chats.forEach(c => {
+        if (c.members.includes(userId)) {
+          io.socketsJoin(c._id)
+        }
+      })
       res.status(200).send(chats);
     } else {
       next(createError(404, "User not found"));
@@ -83,8 +100,10 @@ chatsRouter.get("/:id", jwtAuth, async (req, res, next) => {
 
 chatsRouter.post("/:id/msg", jwtAuth, async (req, res, next) => {
   try {
-    const newMsg = req.body
-    const updatedChat = ChatsModel.findByIdAndUpdate(req.params.id, {$push: {messages: {sender: req.user._id, content: {text: req.body.text}}}})
+    const newMsg = {sender: req.user._id, content: req.body}
+    console.log(newMsg);
+    const updatedChat = await ChatsModel.findByIdAndUpdate(req.params.id, {$push: {messages: newMsg}}, {new: true})
+    console.log(updatedChat.messages);
     if (updatedChat) {
       res.send(updatedChat.messages)
     } else {

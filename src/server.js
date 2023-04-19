@@ -40,7 +40,7 @@ server.use(notfoundHandler)
 server.use(genericErrorHandler)
 
 const httpServer = createServer(server)
-const io = new Server(httpServer)
+export const io = new Server(httpServer)
 io.on("connection", newConnectionHandler)
 
 mongoose.connect(process.env.MONGO_URL)
