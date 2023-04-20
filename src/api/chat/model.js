@@ -5,7 +5,6 @@ const { Schema, model } = mongoose;
 
 const MessageSchema = new Schema(
   {
-    timestamp: { type: Number, required: true },
     sender: { type: Schema.Types.ObjectId, ref: "user" },
     content: {
       text: { type: String, required: true },

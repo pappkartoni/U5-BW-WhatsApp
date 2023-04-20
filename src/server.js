@@ -3,7 +3,7 @@ import cors from "cors"
 import mongoose from "mongoose"
 import {Server} from "socket.io"
 import {createServer} from "http"
-//import {newConnectionHandler} from "./api/chat/index.js"
+import {newConnectionHandler} from "./api/chat/index.js"
 import {badRequestHandler, unauthorizedHandler, notfoundHandler, genericErrorHandler, forbiddenErrorHandler} from "./errorHandlers.js"
 import usersRouter from "./api/users/index.js"
 import createHttpError from "http-errors"
@@ -40,8 +40,8 @@ server.use(notfoundHandler)
 server.use(genericErrorHandler)
 
 const httpServer = createServer(server)
-//const io = new Server(httpServer)
-//io.on("connection", newConnectionHandler)
+export const io = new Server(httpServer)
+io.on("connection", newConnectionHandler)
 
 mongoose.connect(process.env.MONGO_URL)
 
