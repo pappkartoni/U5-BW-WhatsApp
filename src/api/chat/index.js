@@ -16,25 +16,30 @@ export const newConnectionHandler = socket => {
 
   socket.on("join-room", room => 
       {
-        console.log(room)
+        console.log("joined room", room)
     	  socket.join(room)
+        socket.emit("joined-room", `we don did it on ${room}`)
     }
   )
 
+  socket.on("leave-room", room => {
+    socket.leave(room)
+  })
+
   socket.on("outgoing-msg", async (data) => {
-      socket.to(data.room).emit("newMessage", data)
-      const newMsg = {
-        sender: data.sender,
-        content: {
-          text: data.text
-        }
+    const newMsg = {
+      sender: data.sender,
+      content: {
+        text: data.text
       }
-      console.log(data, newMsg)
-      const updated = await ChatsModel.findByIdAndUpdate(data.room, {$push: {messages: newMsg}}, { new: true, runValidators: true })
+    }
+    console.log("newMsg", newMsg)
+    const updated = await ChatsModel.findByIdAndUpdate(data.room, {$push: {messages: newMsg}}, { new: true, runValidators: true })
+    socket.to(data.room).emit("incoming-msg", updated.messages[updated.messages.length-1])
   })
 
   socket.on("incoming-msg", (msg, room) => {
-
+    console.log("incoming", msg, "to", room)
   })
 
   socket.on("disconnect", () => {
@@ -45,19 +50,14 @@ export const newConnectionHandler = socket => {
 
 const chatsRouter = express.Router();
 
-chatsRouter.get("/", jwtAuth, async (req, res) => {
+chatsRouter.get("/", jwtAuth, async (req, res, next) => {
   try {
     const userId = req.user._id;
     const chats = await ChatsModel.find({ members: userId }).populate(
       "members",
       "name email avatar"
-    );
+    ).select("-messages");
     if (chats) {
-      chats.forEach(c => {
-        if (c.members.includes(userId)) {
-          io.socketsJoin(c._id)
-        }
-      })
       res.status(200).send(chats);
     } else {
       next(createError(404, "User not found"));
@@ -96,7 +96,7 @@ chatsRouter.get("/:id", jwtAuth, async (req, res, next) => {
     const chatId = req.params.id;
 
     const chat = await ChatsModel.findOne({ _id: chatId }).populate(
-      "members",
+      "members messages.sender",
       "name email avatar"
     );
     if (!chat) {
