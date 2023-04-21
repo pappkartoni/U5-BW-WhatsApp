@@ -16,7 +16,19 @@ export const newConnectionHandler = socket => {
 
   socket.on("join-room", room => 
       {
-        socket.rooms.clear() //quick and dirty
+        //socket.rooms.clear() //somehow this isn't right
+/*         socket.rooms.forEach(r => {
+          if (r !== socket.id) {
+            console.log(r)
+            socket.leave(r)
+          }
+        }); */
+/*         const rooms = Object.keys(socket.rooms)
+        rooms.forEach(r => {
+          if (r !== socket.id) {
+            socket.leave(r)
+          }
+        }) */
     	  socket.join(room)
         console.log("joined room", room)
         socket.emit("joined-room", `we don did it on ${room}`)
