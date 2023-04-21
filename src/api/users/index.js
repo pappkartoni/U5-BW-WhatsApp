@@ -43,7 +43,7 @@ usersRouter.get("/", async (req, res, next) => {
       ];
     }
 
-    const users = await UsersModel.find(query);
+    const users = await UsersModel.find(query).select("-refreshToken");
     res.status(200).json(users);
   } catch (error) {
     next(error);
