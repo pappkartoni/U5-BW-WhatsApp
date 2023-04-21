@@ -116,7 +116,7 @@ export const googleStrategy = new GoogleStrategy(
         });
 
         const created = await newUser.save();
-        const { accessToken, refreshToken } = createTokens(created);
+        const { accessToken, refreshToken } = await createTokens(created);
         pnext(null, { accessToken, refreshToken });
       }
     } catch (error) {
