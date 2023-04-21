@@ -11,7 +11,7 @@ export const createAccessToken = (payload) =>
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: "150m" },
       (err, token) => {
         if (err) reject(err);
         else resolve(token);
@@ -49,6 +49,7 @@ export const verifyRefreshToken = (token) =>
   );
 
 export const createTokens = async (user) => {
+  console.log(user);
   const accessToken = await createAccessToken({ _id: user._id });
   const refreshToken = await createRefreshToken({ _id: user._id });
 
@@ -114,7 +115,7 @@ export const googleStrategy = new GoogleStrategy(
           googleId: sub,
         });
 
-        const created = newUser.save();
+        const created = await newUser.save();
         const { accessToken, refreshToken } = createTokens(created);
         pnext(null, { accessToken, refreshToken });
       }

@@ -16,8 +16,9 @@ export const newConnectionHandler = socket => {
 
   socket.on("join-room", room => 
       {
-        console.log("joined room", room)
+        socket.rooms.clear() //quick and dirty
     	  socket.join(room)
+        console.log("joined room", room)
         socket.emit("joined-room", `we don did it on ${room}`)
     }
   )
