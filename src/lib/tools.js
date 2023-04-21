@@ -11,7 +11,7 @@ export const createAccessToken = (payload) =>
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: "150m" },
+      { expiresIn: "15m" },
       (err, token) => {
         if (err) reject(err);
         else resolve(token);
@@ -32,7 +32,7 @@ export const createRefreshToken = (payload) =>
     jwt.sign(
       payload,
       process.env.REFRESH_SECRET,
-      { expiresIn: "15m" },
+      { expiresIn: "150m" },
       (err, token) => {
         if (err) reject(err);
         else resolve(token);
@@ -62,9 +62,9 @@ export const verifyAndRefreshTokens = async (currentRefreshToken) => {
   try {
     console.log("bla", currentRefreshToken);
     const { _id } = await verifyRefreshToken(currentRefreshToken);
-    console.log(_id)
+    console.log(_id);
     const user = await UsersModel.findById(_id);
-    console.log(user)
+    console.log(user);
     if (!user) throw new createHttpError(404, `User with id ${_id} not found.`);
     if (user.refreshToken && user.refreshToken === currentRefreshToken) {
       const { accessToken, refreshToken } = await createTokens(user);
